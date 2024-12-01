@@ -86,7 +86,12 @@
     </div>
     <div class="content">
         <div class="card">
-            <h2>Output - GPIO 5</h2>
+            <h2>LED 1</h2>
+            <p class="state">state: <span id="state1">%STATE1%</span></p>
+            <p><button id="button1" class="button">Toggle</button></p>
+        </div>
+        <div class="card">
+            <h2>LED 2</h2>
             <p class="state">state: <span id="state">%STATE%</span></p>
             <p><button id="button" class="button">Toggle</button></p>
         </div>
@@ -112,13 +117,27 @@
         }
         function onMessage(event) {
             var state;
-            if (event.data == "1") {
+            var state1;
+            if (event.data == "LED0 1") {
                 state = "ON";
-            }
-            else {
+            }else if (event.data == "LED0 0") {
                 state = "OFF";
             }
-            document.getElementById('state').innerHTML = state;
+                
+            if (event.data == "LED1 0") {
+                state1 = "OFF";
+            } else if (event.data == "LED1 1") {
+                state1 = "ON";
+            }
+
+            
+            if (state1!=undefined){
+                document.getElementById('state1').innerHTML = state1;
+            }
+            if (state!=undefined){
+                document.getElementById('state').innerHTML = state;
+            }
+            
         }
         function onLoad(event) {
             initWebSocket();
@@ -126,9 +145,13 @@
         }
         function initButton() {
             document.getElementById('button').addEventListener('click', toggle);
+            document.getElementById('button1').addEventListener('click', toggle1);
         }
         function toggle() {
             websocket.send('toggle');
+        }
+        function toggle1() {
+            websocket.send('toggle1');
         }
     </script>
 </body>
