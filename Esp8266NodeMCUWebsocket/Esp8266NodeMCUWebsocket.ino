@@ -11,16 +11,14 @@
 #include <ESPAsyncWebServer.h>
 
 // Replace with your network credentials
-const char* ssid     = "HB.403";
-const char* password = "Dhsg@HB403";
+const char* ssid     = "LAM HOUSE";
+const char* password = "xinchaoban";
 
 bool ledState = 0;
 bool ledState2 = 0;
-const int ledPin = 5;
-const int ledPin2 = 4;
-int D0_Value = D8;
-int raw_Value = A0;
-int Set_point = 120;
+const int ledPin = 14;
+const int ledPin2 = 12;
+
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -260,10 +258,7 @@ void setup(){
   // Serial port for debugging purposes
   Serial.begin(115200);
 
-  // Sensors 
-  pinMode(D0_Value, OUTPUT); // Set pin D8 as digital output
-  pinMode(raw_Value, INPUT);
-
+ 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
 
@@ -285,7 +280,7 @@ void setup(){
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
-    request->send_P(200, "text/html", index_html, processor2);
+    //request->send_P(200, "text/html", index_html, processor2);
   });
 
   // Start server
@@ -296,9 +291,5 @@ void loop() {
   ws.cleanupClients();
   digitalWrite(ledPin, ledState);
    digitalWrite(ledPin2, ledState2);
-     int val_digital = digitalRead(D0_Value);
-  int val_analog = analogRead(raw_Value );
-    Serial.print(val_analog);
-  Serial.print("\t");
-  Serial.println(val_digital);
+   
 }
