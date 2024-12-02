@@ -9,16 +9,31 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <Servo.h>
+#include <SoftwareSerial.h>
 
 // Replace with your network credentials
 const char* ssid     = "LAM HOUSE";
 const char* password = "xinchaoban";
-
+// Other variables
+// Servo
+Servo servo; 
+int pos = 0; 
+String doorState ="";
+// LED
 bool ledState = 0;
 bool ledState2 = 0;
 const int ledPin = 14;
 const int ledPin2 = 12;
-
+// Sensor
+const int US100_TX = 4;
+const int US100_RX = 5;
+SoftwareSerial US100Serial(US100_RX, US100_TX);
+unsigned int MSByteDist = 0;
+unsigned int LSByteDist = 0;
+unsigned int mmDist = 0;
+int temp = 0;
+ 
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -29,7 +44,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 <html>
 
 <head>
-    <title>ESP Web Server</title>
+    <title>ESP Web Client</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         html {
@@ -105,22 +120,84 @@ const char index_html[] PROGMEM = R"rawliteral(
     <title>ESP Web Server</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="data:,">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 
 <body>
     <div class="topnav">
-        <h1>ESP WebSocket Server</h1>
-    </div>
-    <div class="content">
-        <div class="card">
-            <h2>LED 1</h2>
-            <p class="state">state: <span id="state1">%STATE1%</span></p>
-            <p><button id="button1" class="button">Toggle</button></p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-left: 20px;">
+                <h1>ESP WebSocket Client</h1>
+            </div>
+            <div id="LoginDiv" style="margin-right: 20px;">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="loginBtn" data-bs-target="#exampleModal">
+                    Login
+                </button>
+            </div>
         </div>
-        <div class="card">
-            <h2>LED 2</h2>
-            <p class="state">state: <span id="state">%STATE%</span></p>
-            <p><button id="button" class="button">Toggle</button></p>
+
+
+    </div>
+    <div class="container">
+  
+            <div class="row" style="margin-top: 20px;">
+                <div class="col">
+                    <div class="card">
+                        <h2>Sensors</h2>
+                        <p class="state">Current Tempurature: <span id="state1">24*C</span></p>
+                        <p><button  class="button" style="visibility: hidden;" >Toggle</button></p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <h2>Door</h2>
+                        <p class="state">state: <span id="state">%STATE%</span></p>
+                        <p><button id="button2" class="button">Toggle</button></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <h2>LED 1</h2>
+                        <p class="state">state: <span id="state1">%STATE1%</span></p>
+                        <p><button id="button" class="button">Toggle</button></p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <h2>LED 2</h2>
+                        <p class="state">state: <span id="state">%STATE%</span></p>
+                        <p><button id="button1" class="button">Toggle</button></p>
+                    </div>
+                </div>
+            </div>
+
+
+
+     
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="userNameInput" class="form-label">User Name</label>
+                    <input type="text" class="form-control" id="userNameInput" placeholder="Username">
+                    <label for="passwordInput" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="passwordInput" placeholder="Enter Password">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Login</button>
+                </div>
+            </div>
         </div>
     </div>
     <script>
@@ -147,24 +224,24 @@ const char index_html[] PROGMEM = R"rawliteral(
             var state1;
             if (event.data == "LED0 1") {
                 state = "ON";
-            }else if (event.data == "LED0 0") {
+            } else if (event.data == "LED0 0") {
                 state = "OFF";
             }
-                
+
             if (event.data == "LED1 0") {
                 state1 = "OFF";
             } else if (event.data == "LED1 1") {
                 state1 = "ON";
             }
 
-            
-            if (state1!=undefined){
+
+            if (state1 != undefined) {
                 document.getElementById('state1').innerHTML = state1;
             }
-            if (state!=undefined){
+            if (state != undefined) {
                 document.getElementById('state').innerHTML = state;
             }
-            
+
         }
         function onLoad(event) {
             initWebSocket();
@@ -173,6 +250,8 @@ const char index_html[] PROGMEM = R"rawliteral(
         function initButton() {
             document.getElementById('button').addEventListener('click', toggle);
             document.getElementById('button1').addEventListener('click', toggle1);
+            document.getElementById('button2').addEventListener('click', toggle2);
+            document.getElementById('loginBtn').addEventListener('click', login_func);
         }
         function toggle() {
             websocket.send('toggle');
@@ -180,7 +259,17 @@ const char index_html[] PROGMEM = R"rawliteral(
         function toggle1() {
             websocket.send('toggle1');
         }
+        function toggle2() {
+            websocket.send('toggle2');
+        }
+        function login_func() {
+            // login goes here
+            console.log("Login");
+        }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
@@ -189,6 +278,9 @@ const char index_html[] PROGMEM = R"rawliteral(
 void notifyClients() {
   ws.textAll("LED0 "+String(ledState));
   ws.textAll("LED1 " +String(ledState2));
+  ws.textAll("DOOR " +String(doorState));
+  ws.textAll("Temp "+String(temp));
+
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -203,11 +295,14 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       ledState2 = !ledState2;
       notifyClients();
     }
+    if (strcmp((char*)data, "toggle2") == 0) {
+      doorState = !doorState;
+      notifyClients();
+    }
   }
 }
 
-void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
-             void *arg, uint8_t *data, size_t len) {
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
     switch (type) {
       case WS_EVT_CONNECT:
         Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
@@ -257,6 +352,7 @@ String processor2(const String& var){
 void setup(){
   // Serial port for debugging purposes
   Serial.begin(115200);
+  US100Serial.begin(115200);
 
  
   pinMode(ledPin, OUTPUT);
@@ -264,7 +360,7 @@ void setup(){
 
   pinMode(ledPin2, OUTPUT);
   digitalWrite(ledPin2, LOW);
-  
+  servo.attach(D4);
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -288,8 +384,63 @@ void setup(){
 }
 
 void loop() {
+  US100Serial.flush();
+    US100Serial.write(0x55); 
+ 
+    delay(500);
+ 
+    if(US100Serial.available() >= 2) 
+    {
+        MSByteDist = US100Serial.read(); 
+        LSByteDist = US100Serial.read();
+        mmDist  = MSByteDist * 256 + LSByteDist; 
+        if((mmDist > 1) && (mmDist < 10000)) 
+        {
+            Serial.print("Distance: ");
+            Serial.print(mmDist, DEC);
+            Serial.println(" mm");
+        }
+    }
+ 
+    US100Serial.flush(); 
+    US100Serial.write(0x50); 
+ 
+    delay(500);
+    if(US100Serial.available() >= 1) 
+    {
+        temp = US100Serial.read();
+        if((temp > 1) && (temp < 130)) // temprature is in range
+        {
+            temp -= 45; // correct 45º offset
+            Serial.print("Temp: ");
+            Serial.print(temp, DEC);
+            Serial.println(" ºC.");
+        }
+    }
+ 
+    delay(500);
   ws.cleanupClients();
   digitalWrite(ledPin, ledState);
-   digitalWrite(ledPin2, ledState2);
+  digitalWrite(ledPin2, ledState2);
    
+}
+void openDoor(){
+  if (pos == 0){
+  for (pos = 0; pos <= 180; pos += 1) { // rotate from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    servo.write(pos);  // tell servo to go to position in variable 'pos'          
+    delay(10);         // waits 10ms for the servo to reach the position
+    }
+    doorState = "Open";
+  }
+  
+}
+void closeDoor(){
+  if (pos == 180){
+  for (pos = 180; pos >= 0; pos -= 1) { // rotate from 180 degrees to 0 degrees
+    servo.write(pos);   // tell servo to go to position in variable 'pos'
+    delay(10);                          // waits 10ms for the servo to reach the position
+    }
+    doorState = "Close";
+  }
 }
