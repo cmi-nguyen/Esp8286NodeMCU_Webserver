@@ -1,3 +1,15 @@
+#include <LittleFS.h>
+
+
+
+
+
+
+
+
+
+
+
 /*********
   Rui Santos
   Complete project details at https://RandomNerdTutorials.com/esp8266-nodemcu-websocket-server-arduino/
@@ -12,14 +24,18 @@
 #include <Servo.h>
 #include <SoftwareSerial.h>
 
+
+
+
+
 // Replace with your network credentials
-const char* ssid     = "LAM HOUSE";
-const char* password = "xinchaoban";
+const char *ssid = "LAM HOUSE";
+const char *password = "xinchaoban";
 // Other variables
 // Servo
-Servo servo; 
-int pos = 0; 
-String doorState ="";
+Servo servo;
+int pos = 0;
+String doorState = "";
 // LED
 bool ledState = 0;
 bool ledState2 = 0;
@@ -33,7 +49,7 @@ unsigned int MSByteDist = 0;
 unsigned int LSByteDist = 0;
 unsigned int mmDist = 0;
 int temp = 0;
- 
+
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -120,8 +136,8 @@ const char index_html[] PROGMEM = R"rawliteral(
     <title>ESP Web Server</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="data:,">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+   
+
 </head>
 
 <body>
@@ -131,7 +147,8 @@ const char index_html[] PROGMEM = R"rawliteral(
                 <h1>ESP WebSocket Client</h1>
             </div>
             <div id="LoginDiv" style="margin-right: 20px;">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="loginBtn" data-bs-target="#exampleModal">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="loginBtn"
+                    data-bs-target="#exampleModal">
                     Login
                 </button>
             </div>
@@ -140,43 +157,43 @@ const char index_html[] PROGMEM = R"rawliteral(
 
     </div>
     <div class="container">
-  
-            <div class="row" style="margin-top: 20px;">
-                <div class="col">
-                    <div class="card">
-                        <h2>Sensors</h2>
-                        <p class="state">Current Tempurature: <span id="state1">24*C</span></p>
-                        <p><button  class="button" style="visibility: hidden;" >Toggle</button></p>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <h2>Door</h2>
-                        <p class="state">state: <span id="state">%STATE%</span></p>
-                        <p><button id="button2" class="button">Toggle</button></p>
-                    </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <div class="col">
+                <div class="card">
+                    <h2>Sensors</h2>
+                    <p class="state">Current Tempurature: <span id="state1">24*C</span></p>
+                    <p><button class="button" style="visibility: hidden;">Toggle</button></p>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <h2>LED 1</h2>
-                        <p class="state">state: <span id="state1">%STATE1%</span></p>
-                        <p><button id="button" class="button">Toggle</button></p>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <h2>LED 2</h2>
-                        <p class="state">state: <span id="state">%STATE%</span></p>
-                        <p><button id="button1" class="button">Toggle</button></p>
-                    </div>
+            <div class="col">
+                <div class="card">
+                    <h2>Door</h2>
+                    <p class="state">state: <span id="state">%STATE%</span></p>
+                    <p><button id="button2" class="button">Toggle</button></p>
                 </div>
             </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <h2>LED 1</h2>
+                    <p class="state">state: <span id="state1">%STATE1%</span></p>
+                    <p><button id="button" class="button">Toggle</button></p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <h2>LED 2</h2>
+                    <p class="state">state: <span id="state">%STATE%</span></p>
+                    <p><button id="button1" class="button">Toggle</button></p>
+                </div>
+            </div>
+        </div>
 
 
 
-     
+
     </div>
 
     <!-- Login Modal -->
@@ -222,6 +239,8 @@ const char index_html[] PROGMEM = R"rawliteral(
         function onMessage(event) {
             var state;
             var state1;
+            var tempurature;
+            var doorState;
             if (event.data == "LED0 1") {
                 state = "ON";
             } else if (event.data == "LED0 0") {
@@ -233,6 +252,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             } else if (event.data == "LED1 1") {
                 state1 = "ON";
             }
+
 
 
             if (state1 != undefined) {
@@ -264,38 +284,36 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
         function login_func() {
             // login goes here
-            console.log("Login");
+
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
+   
+    
 </body>
 
 </html>
 )rawliteral";
 
 void notifyClients() {
-  ws.textAll("LED0 "+String(ledState));
-  ws.textAll("LED1 " +String(ledState2));
-  ws.textAll("DOOR " +String(doorState));
-  ws.textAll("Temp "+String(temp));
-
+  ws.textAll("LED0 " + String(ledState));
+  ws.textAll("LED1 " + String(ledState2));
+  // ws.textAll("DOOR " +String(doorState));
+  // ws.textAll("Temp "+String(temp));
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
-  AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  AwsFrameInfo *info = (AwsFrameInfo *)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
-    if (strcmp((char*)data, "toggle") == 0) {
+    if (strcmp((char *)data, "toggle") == 0) {
       ledState = !ledState;
       notifyClients();
     }
-    if (strcmp((char*)data, "toggle1") == 0) {
+    if (strcmp((char *)data, "toggle1") == 0) {
       ledState2 = !ledState2;
       notifyClients();
     }
-    if (strcmp((char*)data, "toggle2") == 0) {
+    if (strcmp((char *)data, "toggle2") == 0) {
       doorState = !doorState;
       notifyClients();
     }
@@ -303,19 +321,19 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 }
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
-    switch (type) {
-      case WS_EVT_CONNECT:
-        Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-        break;
-      case WS_EVT_DISCONNECT:
-        Serial.printf("WebSocket client #%u disconnected\n", client->id());
-        break;
-      case WS_EVT_DATA:
-        handleWebSocketMessage(arg, data, len);
-        break;
-      case WS_EVT_PONG:
-      case WS_EVT_ERROR:
-        break;
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+      handleWebSocketMessage(arg, data, len);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
   }
 }
 
@@ -324,37 +342,55 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
-String processor(const String& var){
+String processor(const String &var) {
   Serial.println(var);
-  if(var == "STATE"){
-    if (ledState){
+  if (var == "STATE") {
+    if (ledState) {
       return "ON";
-    }
-    else{
+    } else {
       return "OFF";
     }
   }
   return String();
 }
-String processor2(const String& var){
+String processor2(const String &var) {
   Serial.println(var);
-  if(var == "STATE1"){
-    if (ledState2){
+  if (var == "STATE1") {
+    if (ledState2) {
       return "ON";
-    }
-    else{
+    } else {
       return "OFF";
     }
   }
   return String();
 }
 
-void setup(){
+void setup() {
   // Serial port for debugging purposes
   Serial.begin(115200);
+
+   if(LittleFS.begin()==false){
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
+ 
+   
+    File fileToRead = LittleFS.open("/index.js", "r");
+    if (!fileToRead) {
+        Serial.println("Failed to open /index.js");
+    } else {
+        Serial.println("File opened successfully:");
+        while (fileToRead.available()) {
+            Serial.write(fileToRead.read());
+        }
+        fileToRead.close();
+    }
+  
+
+
   US100Serial.begin(115200);
 
- 
+
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
 
@@ -374,72 +410,77 @@ void setup(){
   initWebSocket();
 
   // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, processor);
-    //request->send_P(200, "text/html", index_html, processor2);
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+     request->send(LittleFS, "/index.html","text/html", false,processor);
+    //request->send_P(200, "text/html", index_html, processor);
   });
+  server.on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    // request->send(LittleFS, "./index.html","text/html", false,processor);
+    request->send(LittleFS, "/index.js", "text/javascript");
+  });
+
 
   // Start server
   server.begin();
 }
 
 void loop() {
-  US100Serial.flush();
-    US100Serial.write(0x55); 
- 
-    delay(500);
- 
-    if(US100Serial.available() >= 2) 
-    {
-        MSByteDist = US100Serial.read(); 
-        LSByteDist = US100Serial.read();
-        mmDist  = MSByteDist * 256 + LSByteDist; 
-        if((mmDist > 1) && (mmDist < 10000)) 
-        {
-            Serial.print("Distance: ");
-            Serial.print(mmDist, DEC);
-            Serial.println(" mm");
-        }
-    }
- 
-    US100Serial.flush(); 
-    US100Serial.write(0x50); 
- 
-    delay(500);
-    if(US100Serial.available() >= 1) 
-    {
-        temp = US100Serial.read();
-        if((temp > 1) && (temp < 130)) // temprature is in range
-        {
-            temp -= 45; // correct 45º offset
-            Serial.print("Temp: ");
-            Serial.print(temp, DEC);
-            Serial.println(" ºC.");
-        }
-    }
- 
-    delay(500);
+
   ws.cleanupClients();
   digitalWrite(ledPin, ledState);
   digitalWrite(ledPin2, ledState2);
-   
+  US100Serial.flush();
+  US100Serial.write(0x55);
+
+  delay(500);
+
+  if (US100Serial.available() >= 2) {
+    MSByteDist = US100Serial.read();
+    LSByteDist = US100Serial.read();
+    mmDist = MSByteDist * 256 + LSByteDist;
+    if ((mmDist > 1) && (mmDist < 10000)) {
+      Serial.print("Distance: ");
+      Serial.print(mmDist, DEC);
+      Serial.println(" mm");
+    }
+    if (mmDist < 50) {
+      digitalWrite(ledPin2, !ledState2);
+    }
+  }
+
+  US100Serial.flush();
+  US100Serial.write(0x50);
+
+  delay(500);
+  if (US100Serial.available() >= 1) {
+    temp = US100Serial.read();
+    if ((temp > 1) && (temp < 130))  // temprature is in range
+    {
+      temp -= 45;  // correct 45º offset
+      Serial.print("Temp: ");
+      Serial.print(temp, DEC);
+      Serial.println(" ºC.");
+      // notifyClients();
+    }
+  }
+
+  delay(500);
 }
-void openDoor(){
-  if (pos == 0){
-  for (pos = 0; pos <= 180; pos += 1) { // rotate from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    servo.write(pos);  // tell servo to go to position in variable 'pos'          
-    delay(10);         // waits 10ms for the servo to reach the position
+void openDoor() {
+  if (pos == 0) {
+    for (pos = 0; pos <= 180; pos += 1) {  // rotate from 0 degrees to 180 degrees
+      // in steps of 1 degree
+      servo.write(pos);  // tell servo to go to position in variable 'pos'
+      delay(10);         // waits 10ms for the servo to reach the position
     }
     doorState = "Open";
   }
-  
 }
-void closeDoor(){
-  if (pos == 180){
-  for (pos = 180; pos >= 0; pos -= 1) { // rotate from 180 degrees to 0 degrees
-    servo.write(pos);   // tell servo to go to position in variable 'pos'
-    delay(10);                          // waits 10ms for the servo to reach the position
+void closeDoor() {
+  if (pos == 180) {
+    for (pos = 180; pos >= 0; pos -= 1) {  // rotate from 180 degrees to 0 degrees
+      servo.write(pos);                    // tell servo to go to position in variable 'pos'
+      delay(10);                           // waits 10ms for the servo to reach the position
     }
     doorState = "Close";
   }
