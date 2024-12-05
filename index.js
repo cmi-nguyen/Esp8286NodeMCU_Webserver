@@ -1,14 +1,31 @@
 var gateway = `ws://${window.location.hostname}/ws`;
-var websocket;
+let websocket;
 window.addEventListener("load", onLoad);
-// function initWebSocket() {
-//     console.log('Trying to open a WebSocket connection...');
-//     console.log(gateway);
-//     websocket = new WebSocket(gateway);
-//     websocket.onopen = onOpen;
-//     websocket.onclose = onClose;
-//     websocket.onmessage = onMessage; // <-- add this line
-// }
+document.addEventListener("DOMContentLoaded", function() {
+  // Get the full state string from the span with id "state2"
+  const state = document.getElementById("states").textContent;
+  // Check if the state is not empty
+  if (state && state !== "%STATE%") {
+    // Split the state string into an array
+    const values = state.split(',');
+
+    // Assign the values to the corresponding HTML elements
+    document.getElementById("state").textContent = values[0] || "N/A";
+      document.getElementById("state1").textContent = values[1] || "N/A";
+      document.getElementById("state2").textContent = values[2] || "N/A";
+      document.getElementById("tempurature").textContent = values[3] + " *C" || "N/A";
+  } else {
+    console.error("State value not found or is invalid.");
+  }
+});
+function initWebSocket() {
+  console.log('Trying to open a WebSocket connection...');
+  console.log(gateway);
+  websocket = new WebSocket(gateway);
+  websocket.onopen = onOpen;
+  websocket.onclose = onClose;
+  websocket.onmessage = onMessage; // <-- add this line
+}
 function onOpen(event) {
   console.log("Connection opened");
 }
@@ -20,21 +37,33 @@ function onMessage(event) {
   var state;
   var state1;
   var tempurature;
-  var doorState;
+  var state2;
   if (event.data == "LED0 1") {
     state = "ON";
-    SaveDataLogEntry("Bật đèn 1");
+    SaveDataLogEntry("Turn On LED1");
   } else if (event.data == "LED0 0") {
     state = "OFF";
-    SaveDataLogEntry("Tắt đèn 1");
+    SaveDataLogEntry("Turn Off LED1");
   }
 
   if (event.data == "LED1 0") {
     state1 = "OFF";
-    SaveDataLogEntry("Tắt đèn 2");
+    SaveDataLogEntry("Turn Off LED2");
   } else if (event.data == "LED1 1") {
     state1 = "ON";
-    SaveDataLogEntry("Bật đèn 2");
+    SaveDataLogEntry("Turn On LED2");
+  }
+
+  if (event.data == "DOOR 0") {
+    state2 = "CLOSED";
+    SaveDataLogEntry("Close Door");
+  } else if (event.data == "DOOR 1") {
+    state2 = "OPEN";
+    SaveDataLogEntry("Open Door");
+  }
+  if(event.data.includes("Temp")){
+    tempurature = event.data.toString();
+    
   }
 
   if (state1 != undefined) {
@@ -43,17 +72,38 @@ function onMessage(event) {
   if (state != undefined) {
     document.getElementById("state").innerHTML = state;
   }
+  if (state2 != undefined) {
+    document.getElementById("state2").innerHTML = state2;
+  }
+  if (tempurature != undefined) {
+    document.getElementById("tempurature").innerHTML = tempurature.substring(5) +" *C";
+  }
+
 }
 function onLoad(event) {
-  // initWebSocket();
+  initWebSocket();
   updateLoginUI(checkSession());
   initButton();
+  
 }
 function initButton() {
   document.getElementById("button").addEventListener("click", toggle);
   document.getElementById("button1").addEventListener("click", toggle1);
   document.getElementById("button2").addEventListener("click", toggle2);
   document.getElementById("loginBtn").addEventListener("click", login_func);
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+}
+function UpdateState(){
+  const state = document.getElementById("states").textContent;
+
+      // Split the state string into an array
+      const values = state.split(',');
+
+      // Assign the values to the corresponding HTML elements
+      document.getElementById("state").textContent = values[0] || "N/A";
+      document.getElementById("state1").textContent = values[1] || "N/A";
+      document.getElementById("state2").textContent = values[2] || "N/A";
+      document.getElementById("temperature").textContent = values[3] || "N/A";
 }
 function toggle() {
   if (!checkSession()) {
@@ -138,8 +188,8 @@ function updateLoginUI(isLogin) {
 function SaveDataLogEntry(action) {
   // Create request
   const user = JSON.parse(sessionStorage.getItem("user"));
-  var date= new Date();
-  const requestBody ={
+  var date = new Date();
+  const requestBody = {
     "Id": 0,
     "user": `${user.accountName}`,
     "action": action,
@@ -154,7 +204,7 @@ function SaveDataLogEntry(action) {
       "Access-Control-Allow-Origin": "*", // Allow cross-origin requests
       "Access-Control-Allow-Headers": "Content-Type", // Allow headers
     },
-    success: function (data) {},
+    success: function (data) { },
     error: function (xhr, status, error) {
       console.error("Error during posting data:", error);
       alert("An error occurred while posting data. Please try again.");

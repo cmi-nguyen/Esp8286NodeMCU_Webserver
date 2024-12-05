@@ -75,7 +75,7 @@
             font-weight: bold;
         }
     </style>
-    <title>ESP Web Server</title>
+    <title>ESP Web Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="data:,">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -85,18 +85,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-    <script src="index.js"></script>
+    <script src="admin.js"></script>
 </head>
 
 <body>
     <div class="topnav">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="margin-left: 20px;">
-                <h1>ESP WebSocket Client</h1>
+                <h1>ESP WebSocket Admin</h1>
             </div>
+           
             <div id="LoginDiv" style="margin-right: 20px;">
                 <span id="sessionUsername" style="color: #F8F7F9;">test</span>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="loginFormBtn" data-bs-target="#exampleModal">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="loginFormBtn"
+                    data-bs-target="#exampleModal">
                     Login
                 </button>
                 <button type="button" class="btn btn-primary" id="logoutBtn">Logout</button>
@@ -106,43 +108,42 @@
 
     </div>
     <div class="container">
-        <p style="display: none;"><span id="states">%STATE%</span></p>
-        <div class="row" style="margin-top: 20px;">
-            <div class="col">
-                <div class="card">
-                    <h2>Sensors</h2>
-                    <p class="state">Current Tempurature: <span id="tempurature"></span></p>
-                    <p><button class="button" style="visibility: hidden;">Toggle</button></p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <h2>Door</h2>
-                    <p class="state">state: <span id="state2"></span></p>
-                    <p><button id="button2" class="button">Toggle</button></p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <h2>LED 1</h2>
-                    <p class="state">state: <span id="state"></span></p>
-                    <p><button id="button" class="button">Toggle</button></p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <h2>LED 2</h2>
-                    <p class="state">state: <span id="state1"></span></p>
-                    <p><button id="button1" class="button">Toggle</button></p>
-                </div>
-            </div>
-        </div>
 
 
-
-
+        <!-- <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">User</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table> -->
+        <form class="d-flex" id="searchForm" style="margin-top: 20px;">
+            <input class="form-control me-2" type="search" placeholder="Search" id="searchTxt" aria-label="Search">
+            <input type="datetime-local" id="datetimepicker">
+            <button class="btn btn-outline-success" type="button" onclick="SearchFiler()">Search</button>
+          </form>
+        <table class="table table-hover caption-top" id="myTable">
+            <caption>
+                List of Actions
+              </caption>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Date & Time</th>
+                    <th scope="col">User</th>
+                </tr>
+            </thead>
+            <tbody >
+              
+            </tbody>
+          </table>
     </div>
 
     <!-- Login Modal -->

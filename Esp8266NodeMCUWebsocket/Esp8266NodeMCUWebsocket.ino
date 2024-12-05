@@ -22,6 +22,8 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <Servo.h>
+#include <I2S.h>
+
 #include <SoftwareSerial.h>
 
 
@@ -35,7 +37,7 @@ const char *password = "xinchaoban";
 // Servo
 Servo servo;
 int pos = 0;
-String doorState = "";
+bool doorState = 0;
 // LED
 bool ledState = 0;
 bool ledState2 = 0;
@@ -44,7 +46,9 @@ const int ledPin2 = 12;
 // Sensor
 const int US100_TX = 4;
 const int US100_RX = 5;
+ 
 SoftwareSerial US100Serial(US100_RX, US100_TX);
+ 
 unsigned int MSByteDist = 0;
 unsigned int LSByteDist = 0;
 unsigned int mmDist = 0;
@@ -297,8 +301,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 void notifyClients() {
   ws.textAll("LED0 " + String(ledState));
   ws.textAll("LED1 " + String(ledState2));
-  // ws.textAll("DOOR " +String(doorState));
-  // ws.textAll("Temp "+String(temp));
+  ws.textAll("DOOR " +String(doorState));
+  ws.textAll("Temp "+String(temp));
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -344,30 +348,47 @@ void initWebSocket() {
 
 String processor(const String &var) {
   Serial.println(var);
+  String data;
   if (var == "STATE") {
     if (ledState) {
-      return "ON";
+      data+= "ON,";
     } else {
-      return "OFF";
+      data+= "OFF,";
     }
-  }
-  return String();
-}
-String processor2(const String &var) {
-  Serial.println(var);
-  if (var == "STATE1") {
     if (ledState2) {
-      return "ON";
+      data+= "ON,";
     } else {
-      return "OFF";
+      data+= "OFF,";
     }
+    if(doorState){
+      data+= "OPEN,";
+    }else{
+      data+="CLOSED,";
+    }
+    data+=temp;
   }
-  return String();
+  
+ 
+  
+  
+  return data;
 }
+// String processor2(const String &var) {
+//   Serial.println(var);
+//   if (var == "STATE1") {
+//     if (ledState2) {
+//       return "ON";
+//     } else {
+//       return "OFF";
+//     }
+//   }
+//   return String();
+// }
 
 void setup() {
   // Serial port for debugging purposes
   Serial.begin(115200);
+  US100Serial.begin(9600);
 
    if(LittleFS.begin()==false){
     Serial.println("An Error has occurred while mounting LittleFS");
@@ -388,7 +409,7 @@ void setup() {
   
 
 
-  US100Serial.begin(115200);
+ 
 
 
   pinMode(ledPin, OUTPUT);
@@ -397,6 +418,7 @@ void setup() {
   pinMode(ledPin2, OUTPUT);
   digitalWrite(ledPin2, LOW);
   servo.attach(D4);
+  servo.write(-1);
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -425,6 +447,7 @@ void setup() {
 }
 
 void loop() {
+ 
 
   ws.cleanupClients();
   digitalWrite(ledPin, ledState);
@@ -432,8 +455,7 @@ void loop() {
   US100Serial.flush();
   US100Serial.write(0x55);
 
-  delay(500);
-
+  delay(300);
   if (US100Serial.available() >= 2) {
     MSByteDist = US100Serial.read();
     LSByteDist = US100Serial.read();
@@ -442,16 +464,22 @@ void loop() {
       Serial.print("Distance: ");
       Serial.print(mmDist, DEC);
       Serial.println(" mm");
+      
     }
     if (mmDist < 50) {
-      digitalWrite(ledPin2, !ledState2);
+      if (ledState2){
+        ledState2 =!ledState2;
+        digitalWrite(ledPin2, ledState2);
+        notifyClients();
+      }
+      
     }
   }
 
   US100Serial.flush();
   US100Serial.write(0x50);
 
-  delay(500);
+  delay(300);
   if (US100Serial.available() >= 1) {
     temp = US100Serial.read();
     if ((temp > 1) && (temp < 130))  // temprature is in range
@@ -460,28 +488,35 @@ void loop() {
       Serial.print("Temp: ");
       Serial.print(temp, DEC);
       Serial.println(" ºC.");
-      // notifyClients();
     }
   }
 
   delay(500);
+  if (doorState){
+    closeDoor();
+    Serial.print(pos);
+  }
+  if(!doorState){
+    openDoor();
+    Serial.print(pos);
+  }
+
 }
 void openDoor() {
-  if (pos == 0) {
-    for (pos = 0; pos <= 180; pos += 1) {  // rotate from 0 degrees to 180 degrees
+  
+for (pos = 0; pos < 180; pos += 10) {  // rotate from 0 degrees to 180 degrees
       // in steps of 1 degree
       servo.write(pos);  // tell servo to go to position in variable 'pos'
       delay(10);         // waits 10ms for the servo to reach the position
     }
-    doorState = "Open";
-  }
+  
 }
 void closeDoor() {
-  if (pos == 180) {
-    for (pos = 180; pos >= 0; pos -= 1) {  // rotate from 180 degrees to 0 degrees
+  
+for (pos = 180; pos > 0; pos -= 10) {  // rotate from 180 degrees to 0 degrees
       servo.write(pos);                    // tell servo to go to position in variable 'pos'
       delay(10);                           // waits 10ms for the servo to reach the position
     }
-    doorState = "Close";
-  }
+
+    
 }

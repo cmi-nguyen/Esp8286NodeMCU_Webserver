@@ -80,12 +80,12 @@
     <link rel="icon" href="data:,">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
     <script src="index.js"></script>
-
 </head>
 
 <body>
@@ -95,29 +95,30 @@
                 <h1>ESP WebSocket Client</h1>
             </div>
             <div id="LoginDiv" style="margin-right: 20px;">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="loginBtn"
-                    data-bs-target="#exampleModal">
+                <span id="sessionUsername" style="color: #F8F7F9;">test</span>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="loginFormBtn" data-bs-target="#exampleModal">
                     Login
                 </button>
+                <button type="button" class="btn btn-primary" id="logoutBtn">Logout</button>
             </div>
         </div>
 
 
     </div>
     <div class="container">
-
+        <p style="display: none;"><span id="states">%STATE%</span></p>
         <div class="row" style="margin-top: 20px;">
             <div class="col">
                 <div class="card">
                     <h2>Sensors</h2>
-                    <p class="state">Current Tempurature: <span id="state1">24*C</span></p>
+                    <p class="state">Current Tempurature: <span id="tempurature"></span></p>
                     <p><button class="button" style="visibility: hidden;">Toggle</button></p>
                 </div>
             </div>
             <div class="col">
                 <div class="card">
                     <h2>Door</h2>
-                    <p class="state">state: <span id="state">%STATE%</span></p>
+                    <p class="state">state: <span id="state2"></span></p>
                     <p><button id="button2" class="button">Toggle</button></p>
                 </div>
             </div>
@@ -126,14 +127,14 @@
             <div class="col">
                 <div class="card">
                     <h2>LED 1</h2>
-                    <p class="state">state: <span id="state1">%STATE1%</span></p>
+                    <p class="state">state: <span id="state"></span></p>
                     <p><button id="button" class="button">Toggle</button></p>
                 </div>
             </div>
             <div class="col">
                 <div class="card">
                     <h2>LED 2</h2>
-                    <p class="state">state: <span id="state">%STATE%</span></p>
+                    <p class="state">state: <span id="state1"></span></p>
                     <p><button id="button1" class="button">Toggle</button></p>
                 </div>
             </div>
@@ -160,11 +161,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Login</button>
+                    <button type="button" class="btn btn-primary" id="loginBtn">Login</button>
                 </div>
             </div>
         </div>
     </div>
+
 
 
 </body>
