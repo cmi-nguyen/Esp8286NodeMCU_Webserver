@@ -303,6 +303,7 @@ void notifyClients() {
   ws.textAll("LED1 " + String(ledState2));
   ws.textAll("DOOR " +String(doorState));
   ws.textAll("Temp "+String(temp));
+  Serial.println("LED0 " + String(ledState)+"|"+"LED1 " + String(ledState2)+"|"+"DOOR " +String(doorState)+"|"+"Temp "+String(temp));
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -407,7 +408,16 @@ void setup() {
         fileToRead.close();
     }
   
-
+File fileToRead2 = LittleFS.open("/index.html", "r");
+    if (!fileToRead2) {
+        Serial.println("Failed to open /index.html");
+    } else {
+        Serial.println("File opened successfully:");
+        while (fileToRead2.available()) {
+            Serial.write(fileToRead2.read());
+        }
+        fileToRead2.close();
+    }
 
  
 
@@ -461,9 +471,9 @@ void loop() {
     LSByteDist = US100Serial.read();
     mmDist = MSByteDist * 256 + LSByteDist;
     if ((mmDist > 1) && (mmDist < 10000)) {
-      Serial.print("Distance: ");
-      Serial.print(mmDist, DEC);
-      Serial.println(" mm");
+      // Serial.print("Distance: ");
+      // Serial.print(mmDist, DEC);
+      // Serial.println(" mm");
       
     }
     if (mmDist < 50) {
@@ -485,25 +495,25 @@ void loop() {
     if ((temp > 1) && (temp < 130))  // temprature is in range
     {
       temp -= 45;  // correct 45º offset
-      Serial.print("Temp: ");
-      Serial.print(temp, DEC);
-      Serial.println(" ºC.");
+      // Serial.print("Temp: ");
+      // Serial.print(temp, DEC);
+      // Serial.println(" ºC.");
     }
   }
 
   delay(500);
   if (doorState){
     closeDoor();
-    Serial.print(pos);
+    //Serial.print(pos);
   }
   if(!doorState){
     openDoor();
-    Serial.print(pos);
+    //Serial.print(pos);
   }
 
 }
 void openDoor() {
-  
+
 for (pos = 0; pos < 180; pos += 10) {  // rotate from 0 degrees to 180 degrees
       // in steps of 1 degree
       servo.write(pos);  // tell servo to go to position in variable 'pos'
@@ -512,7 +522,7 @@ for (pos = 0; pos < 180; pos += 10) {  // rotate from 0 degrees to 180 degrees
   
 }
 void closeDoor() {
-  
+
 for (pos = 180; pos > 0; pos -= 10) {  // rotate from 180 degrees to 0 degrees
       servo.write(pos);                    // tell servo to go to position in variable 'pos'
       delay(10);                           // waits 10ms for the servo to reach the position

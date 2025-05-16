@@ -91,6 +91,7 @@ function initButton() {
   document.getElementById("button1").addEventListener("click", toggle1);
   document.getElementById("button2").addEventListener("click", toggle2);
   document.getElementById("loginBtn").addEventListener("click", login_func);
+  document.getElementById("logoutBtn").addEventListener("click", logout);
 }
 function UpdateState(){
   const state = document.getElementById("states").textContent;
@@ -133,7 +134,7 @@ function login_func() {
 
   // Send the AJAX request
   $.ajax({
-    url: "http://localhost:8080/accounts/login",
+    url: "http://192.168.1.17:8080/accounts/login",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(requestBody),
@@ -186,27 +187,27 @@ function updateLoginUI(isLogin) {
 }
 function SaveDataLogEntry(action) {
   // Create request
-  const user = JSON.parse(sessionStorage.getItem("user"));
-  var date = new Date();
-  const requestBody = {
-    "Id": 0,
-    "user": `${user.accountName}`,
-    "action": action,
-    "date": date.toLocaleString()
-  }
-  $.ajax({
-    url: "http://localhost:8080/logs",
-    type: "POST",
-    contentType: "application/json",
-    data: JSON.stringify(requestBody),
-    headers: {
-      "Access-Control-Allow-Origin": "*", // Allow cross-origin requests
-      "Access-Control-Allow-Headers": "Content-Type", // Allow headers
-    },
-    success: function (data) { },
-    error: function (xhr, status, error) {
-      console.error("Error during posting data:", error);
-      alert("An error occurred while posting data. Please try again.");
-    },
-  });
+  // const user = JSON.parse(sessionStorage.getItem("user"));
+  // var date = new Date();
+  // const requestBody = {
+  //   "Id": 0,
+  //   "user": `${user.accountName}`,
+  //   "action": action,
+  //   "date": date.toLocaleString()
+  // }
+  // $.ajax({
+  //   url: "http://localhost:8080/logs",
+  //   type: "POST",
+  //   contentType: "application/json",
+  //   data: JSON.stringify(requestBody),
+  //   headers: {
+  //     "Access-Control-Allow-Origin": "*", // Allow cross-origin requests
+  //     "Access-Control-Allow-Headers": "Content-Type", // Allow headers
+  //   },
+  //   success: function (data) { },
+  //   error: function (xhr, status, error) {
+  //     console.error("Error during posting data:", error);
+  //     alert("An error occurred while posting data. Please try again.");
+  //   },
+  // });
 }
