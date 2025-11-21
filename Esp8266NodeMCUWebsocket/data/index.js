@@ -134,7 +134,7 @@ function login_func() {
 
   // Send the AJAX request
   $.ajax({
-    url: "http://192.168.1.17:8080/accounts/login",
+    url: "http://192.168.43.20:8080/accounts/login",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(requestBody),

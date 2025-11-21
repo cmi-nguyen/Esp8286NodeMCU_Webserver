@@ -31,8 +31,8 @@
 
 
 // Replace with your network credentials
-const char *ssid = "LAM HOUSE";
-const char *password = "xinchaoban";
+const char *ssid = "Nguyn";
+const char *password = "nguynnek";
 // Other variables
 // Servo
 Servo servo;
