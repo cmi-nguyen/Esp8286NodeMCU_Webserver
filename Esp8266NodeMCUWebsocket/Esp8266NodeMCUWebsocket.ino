@@ -31,8 +31,8 @@
 
 
 // Replace with your network credentials
-const char *ssid = "Nguyn";
-const char *password = "nguynnek";
+const char *ssid = "CaroCoffee";
+const char *password = "carobanhmi";
 // Other variables
 // Servo
 Servo servo;
@@ -477,11 +477,12 @@ void loop() {
       
     }
     if (mmDist < 50) {
-      if (ledState2){
+    
         ledState2 =!ledState2;
         digitalWrite(ledPin2, ledState2);
         notifyClients();
-      }
+      
+     
       
     }
   }

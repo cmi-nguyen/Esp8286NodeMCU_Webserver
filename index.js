@@ -1,7 +1,7 @@
 var gateway = `ws://${window.location.hostname}/ws`;
 let websocket;
 window.addEventListener("load", onLoad);
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   // Get the full state string from the span with id "state2"
   const state = document.getElementById("states").textContent;
   // Check if the state is not empty
@@ -11,9 +11,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Assign the values to the corresponding HTML elements
     document.getElementById("state").textContent = values[0] || "N/A";
-      document.getElementById("state1").textContent = values[1] || "N/A";
-      document.getElementById("state2").textContent = values[2] || "N/A";
-      document.getElementById("tempurature").textContent = values[3] + " *C" || "N/A";
+    document.getElementById("state1").textContent = values[1] || "N/A";
+    document.getElementById("state2").textContent = values[2] || "N/A";
+    document.getElementById("tempurature").textContent = values[3] + " *C" || "N/A";
   } else {
     console.error("State value not found or is invalid.");
   }
@@ -61,9 +61,9 @@ function onMessage(event) {
     state2 = "OPEN";
     SaveDataLogEntry("Open Door");
   }
-  if(event.data.includes("Temp")){
+  if (event.data.includes("Temp")) {
     tempurature = event.data.toString();
-    
+
   }
 
   if (state1 != undefined) {
@@ -76,7 +76,7 @@ function onMessage(event) {
     document.getElementById("state2").innerHTML = state2;
   }
   if (tempurature != undefined) {
-    document.getElementById("tempurature").innerHTML = tempurature.substring(5) +" *C";
+    document.getElementById("tempurature").innerHTML = tempurature.substring(5) + " *C";
   }
 
 }
@@ -84,7 +84,7 @@ function onLoad(event) {
   initWebSocket();
   updateLoginUI(checkSession());
   initButton();
-  
+
 }
 function initButton() {
   document.getElementById("button").addEventListener("click", toggle);
@@ -93,17 +93,17 @@ function initButton() {
   document.getElementById("loginBtn").addEventListener("click", login_func);
   document.getElementById("logoutBtn").addEventListener("click", logout);
 }
-function UpdateState(){
+function UpdateState() {
   const state = document.getElementById("states").textContent;
 
-      // Split the state string into an array
-      const values = state.split(',');
+  // Split the state string into an array
+  const values = state.split(',');
 
-      // Assign the values to the corresponding HTML elements
-      document.getElementById("state").textContent = values[0] || "N/A";
-      document.getElementById("state1").textContent = values[1] || "N/A";
-      document.getElementById("state2").textContent = values[2] || "N/A";
-      document.getElementById("temperature").textContent = values[3] || "N/A";
+  // Assign the values to the corresponding HTML elements
+  document.getElementById("state").textContent = values[0] || "N/A";
+  document.getElementById("state1").textContent = values[1] || "N/A";
+  document.getElementById("state2").textContent = values[2] || "N/A";
+  document.getElementById("temperature").textContent = values[3] || "N/A";
 }
 function toggle() {
   if (!checkSession()) {
@@ -134,7 +134,7 @@ function login_func() {
 
   // Send the AJAX request
   $.ajax({
-    url: "http://localhost:8080/accounts/login",
+    url: "http://192.168.100.247:8080/accounts/login",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(requestBody),
@@ -196,7 +196,7 @@ function SaveDataLogEntry(action) {
     "date": date.toLocaleString()
   }
   $.ajax({
-    url: "http://localhost:8080/logs",
+    url: "http://192.168.100.247:8080/logs",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(requestBody),
